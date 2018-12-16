@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mapper.ShoppingMapper">
+	<resultMap type="Shopping" id="ShoppingResultMapper">
+		<id property="shoppingId" column="shoppingId" />
+		<result property="userId" column="userId" />
+		<result property="bookNum" column="bookNum" />
+		<association property="book" column="bookId"
+			javaType="Book" select="findBook"></association>
+	</resultMap>
+
+	<resultMap type="book" id="bookResultMapper">
+		<id property="bookId" column="bookId" />
+		<result property="bookName" column="bookName" />
+		<result property="bookPrice" column="bookPrice" />
+		<result property="bookSum" column="bookSum" />
+		<result property="bookPic" column="bookPic" />
+	</resultMap>
+	<select id="findBook" parameterType="int"
+		resultMap="bookResultMapper">
+		select * from book where bookId=#{id}
+	</select>
+<select id="findByUserId"  parameterType="int" resultMap="ShoppingResultMapper">
+select * from shopping where userId=#{userId}
+
+</select>
+	<insert id="insertGwc" parameterType="Shopping">
+		insert into
+		shopping(userId,bookId,bookNum)
+		values(#{userId},#{book.bookId},1)
+	</insert>
+	
+	<delete id="deletejl" parameterType="int">
+		delete from shopping where
+		userId=#{id}
+	</delete>
+		<delete id="deletejl2" parameterType="int">
+		delete from shopping where
+		userId=#{id} and bookNum=0
+	</delete>
+	<update id="updateGwc" parameterType="shopping">
+		update shopping set
+		bookNum=#{bookNum} where bookId=#{book.bookId} and
+		userId=#{userId}
+	</update>
+	<update id="updateGwc2" parameterType="Integer">
+		update shopping set
+		bookNum=bookNum+1 where bookId=#{bookId} and
+		userId=#{userId}
+	</update>
+	<select id="sfcz" parameterType="Integer" resultType="Integer">
+		select
+		shoppingId from shopping where userId=#{userId} and bookId=#{bookId}
+	</select>
+	<select id="findPriceSum2" parameterType="int"
+		resultType="double">
+		SELECT SUM(b.`bookPrice` * s.`bookNum`) AS priceSum FROM
+		book b,shopping s
+		WHERE userId=#{id} AND b.bookId=s.bookId
+	</select>
+</mapper>

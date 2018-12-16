@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mapper.BookMapper">
+	<resultMap type="book" id="bookResultMapper">
+		<id property="bookId" column="bookId" />
+		<result property="bookName" column="bookName" />
+		<result property="bookPrice" column="bookPrice" />
+		<result property="bookSum" column="bookSum" />
+		<result property="bookPic" column="bookPic" />
+
+	</resultMap>
+
+   <update id="updateSum" parameterType="book" >
+   update book set bookSum=#{bookSum} where bookId=#{bookId}
+   </update>
+
+	<select id="findCount" parameterType="book" resultType="int">
+		select count(bookId) from book where 1=1
+		<if test="bookName != null and bookName != ''">
+			and bookName like concat("%",#{bookName},"%")
+		</if>
+	</select>
+
+	<select id="findByPage" parameterType="map"
+		resultMap="bookResultMapper">
+		select * from book where 1=1
+		<if test="book.bookName !=null and book.bookName !=''">
+			and bookName like concat("%",#{book.bookName},"%")
+		</if>
+
+		limit #{from},3
+	</select>
+
+	<select id="findByUserId" parameterType="int"
+		resultMap="bookResultMapper">
+		SELECT s.bookId,bookSum, bookPic,bookName,SUM(bookNum) AS bookNum ,bookPrice FROM
+		book b,shopping s
+		WHERE userId=#{id} AND b.bookId=s.bookId
+		GROUP BY s.bookId
+	</select>
+
+	<select id="selectById" parameterType="int"
+		resultMap="bookResultMapper">
+		select * from book where bookId=#{id}
+	</select>
+ 
+ <select id="selectOrderId" parameterType="map"  resultType="Integer" >
+ 	SELECT o.orderId FROM `order` o,book b,detail d WHERE  bookName LIKE CONCAT("%",#{bookName},"%") AND 
+b.`bookId`=d.bookid AND o.`orderId`=d.`orderId` AND o.`userId`=#{userId}
+ 	
+ </select>
+ 	
+
+
+</mapper>

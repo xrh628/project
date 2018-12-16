@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mapper.DetailMapper">
+	<resultMap type="detail" id="detailResultMapper">
+		<id property="detailId" column="detailId" />
+		<result property="orderId" column="orderId" />
+		<result property="bookId" column="bookId" />
+		<result property="bookSum" column="bookSum" />
+	
+	</resultMap>
+		<insert id="addDetail" parameterType="detail">
+		insert into detail(orderId,bookId,bookSum) values(#{orderId},#{book.bookId},#{bookSum})
+		</insert>
+	   
+	</mapper>

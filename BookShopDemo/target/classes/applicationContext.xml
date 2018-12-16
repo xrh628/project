@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+<!-- 扫描包中使用注解标注的类和方法 -->
+<context:component-scan base-package="service,entity,mapper,common"/>
+
+<!-- 配置属性转换器 -->
+<bean id="conversionService"
+		class="org.springframework.context.support.ConversionServiceFactoryBean" >
+<property name="converters">
+<set>
+<bean class="common.StringToDate"/>
+</set>
+</property>
+</bean>
+<!-- 配置数据库连接池 -->
+<bean id="dataSource"
+class="org.apache.commons.dbcp.BasicDataSource"  destroy-method="close">
+<property name="driverClassName"  value="com.mysql.jdbc.Driver"/>
+<property name="url"  value="jdbc:mysql:///shudian" />
+<property name="username"  value="root"/>
+<property name="password"  value="mysql" />
+</bean>
+<!-- 配置SqlSessionFactory -->
+<bean id="sqlSessionFactory"
+   class="org.mybatis.spring.SqlSessionFactoryBean" >
+   <property name="dataSource" ref="dataSource" />
+   <property name="configLocation"  value="classpath:mybatis-config.xml" />
+   </bean>
+ <!-- 使用MapperScannerConfigurer自动配置mapper -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="mapper" />
+	</bean>
+<!-- 配置service -->
+	<bean id="bookService"
+		class="service.BookServiceImpl">
+		<property name="bookMapper" ref="bookMapper"></property>
+	</bean>
+	
+		<bean id="userService"
+		class="service.UserService">
+		<property name="userMapper" ref="userMapper"></property>
+	</bean>
+	
+	<bean id="shoppingService" class="service.ShoppingService">
+	<property name="shoppingMapper"  ref="shoppingMapper" />
+	</bean>
+	
+	<bean id="orderService" class="service.OrderService">
+	<property name="orderMapper"  ref="orderMapper" />
+	</bean>
+	
+	<bean id="detailService" class="service.DetailService">
+	<property name="detailMapper"  ref="detailMapper" />
+	</bean>
+
+	<bean id="txManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<tx:advice id="txAdvice" transaction-manager="txManager">
+		<tx:attributes>
+			<tx:method name="insert*" propagation="REQUIRED" />
+			<tx:method name="update*" propagation="REQUIRED" />
+			<tx:method name="delete*" propagation="REQUIRED" />
+			<tx:method name="*" propagation="SUPPORTS" read-only="true" />
+		</tx:attributes>
+	</tx:advice>
+
+	<aop:config>
+		<aop:pointcut id="productServiceMethods"
+			expression="execution(* service.*.*(..))" />
+		<aop:advisor advice-ref="txAdvice"
+			pointcut-ref="productServiceMethods" />
+	</aop:config> 
+    
+</beans>
